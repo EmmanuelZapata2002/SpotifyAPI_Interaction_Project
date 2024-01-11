@@ -4,6 +4,10 @@ import base64
 from dotenv import load_dotenv
 from requests import post,get
 import sys
+
+import matplotlib.pyplot as plot
+import seaborn as seas
+
 # This is used for user input via the command line
 
 
@@ -106,20 +110,29 @@ class SpotifyAPIScenarios:
             print(f"   Release Date: {formatted_songs[i]['Release Date']}")
             print(f"   Preview URL: {formatted_songs[i]['Preview URL']}\n")
 
+#
+# class DataVisTechniques:
+#
+#     @staticmethod
+#     def initializeDataVis(something):
+
+
+
+
 class Main:
 
     token = SpotifyAPIScenarios.getAccessToken()
-    if len(sys.argv) == 2: # Non-Specific Information about the artist
-        artist_userinput = sys.argv[1]
+    known_commands = {"top_tracks","cover_photo","artist_info" }
+
+    if len(sys.argv) > 1 and sys.argv[-1] not in known_commands: # Non-Specific Information about the artist
+        artist_userinput = ' '.join(sys.argv[1:])
         search_Result = SpotifyAPIScenarios.search_ForArtist(token, artist_userinput)
         artist_ID = SpotifyAPIScenarios.get_ArtistID(token, artist_userinput)
         SpotifyAPIScenarios.get_TopTracksByArtist(token, artist_ID)
         cover_Photo = SpotifyAPIScenarios.search_ForArtistCoverPhoto(token, artist_userinput)
         print(cover_Photo)
-    else:
-        print("No arguments provided")
 
-    if len(sys.argv) > 2: # User specifies what they want from the command line
+    if len(sys.argv) > 2 and sys.argv[-1] in known_commands: # User specifies what they want from the command line
         artist_userinput = ' '.join(sys.argv[1:-1])
         command = sys.argv[-1]
         artist_ID = SpotifyAPIScenarios.get_ArtistID(token, artist_userinput)
@@ -135,6 +148,17 @@ class Main:
             # You can add more elif blocks for other commands
         else:
              print("Unknown command")
+
+    if len(sys.argv) == 1:
+        print("No arguments provided. Try Again please !")
+
+
+    # Check the following tmm:
+    # Find Data-Vis Techniques
+
+    # commit to the github Repo
+
+
 
 
 
