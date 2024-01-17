@@ -6,8 +6,7 @@ from requests import post,get
 import sys
 import webbrowser
 
-import matplotlib.pyplot as plot
-import seaborn as seas
+import mapVisualizer
 
 # This is used for user input via the command line
 
@@ -153,7 +152,11 @@ class SpotifyAPIScenarios:
 
 
 
+
+
 class Main:
+    countries_to_highlight = ['US', 'CA', 'GB', 'FR', 'DE']
+    mapVisualizer.DataVis.highlight_countries(countries_to_highlight)
 
     token = SpotifyAPIScenarios.getAccessToken()
     known_commands = {"top_tracks","cover_photo","artist_info","30-second_sample", "albums", "wikipedia","profile",
