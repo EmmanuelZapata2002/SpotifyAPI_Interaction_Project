@@ -4,6 +4,7 @@ import base64
 from dotenv import load_dotenv
 from requests import post,get
 import sys
+import webbrowser
 
 import matplotlib.pyplot as plot
 import seaborn as seas
@@ -161,8 +162,14 @@ class Main:
             print(SpotifyAPIScenarios.format_30secondPreview(samples))
         # elif command == "albums": Add to this after finishing the albums portion of the site
 
+
         #
-        # elif command == "wikipedia":
+        elif command == "wikipedia":
+            wikipedia_url = f"https://en.wikipedia.org/wiki/{artist_userinput.replace(' ', '_')}"
+            webbrowser.open(wikipedia_url)
+
+
+
 
         # elif command == "radio":
         #
