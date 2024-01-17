@@ -83,9 +83,13 @@ class SpotifyAPIScenarios:
         json_result = json.loads(result.content)["tracks"]
         return json_result
 
-    # @staticmethod
-    # def get_AlbumsByArtist(token, artistID):
-    #
+    @staticmethod
+    def get_AlbumsByArtist(token, artistID):
+        url = f"https://api.spotify.com/v1/artists/{artistID}/albums"
+        headers = SpotifyAPIScenarios.get_AuthHeader(token)
+        result = get(url, headers=headers)
+        json_result = json.loads(result.content)["items"]
+        return json_result
 
 
     @staticmethod
@@ -118,6 +122,29 @@ class SpotifyAPIScenarios:
             print(f"   Preview URL: {formatted_songs[i]['Preview URL']}\n")
 
     @staticmethod
+    def format_album_list(album_list):
+        formatted_albums = []  # This will hold the formatted album information
+
+        for album in album_list:
+            # Extracting relevant album information
+            album_info = {
+                "Album Name": album['name'],
+                "Artists": ", ".join([artist['name'] for artist in album['artists']]),
+                "Release Date": album['release_date'],
+                "Total Tracks": album['total_tracks'],
+                "Spotify URL": album['external_urls']['spotify']
+            }
+            formatted_albums.append(album_info)
+
+        # Printing the formatted album information
+        for i, album in enumerate(formatted_albums, 1):
+            print(f"{i}. Album Name: {album['Album Name']}")
+            print(f"   Artists: {album['Artists']}")
+            print(f"   Release Date: {album['Release Date']}")
+            print(f"   Total Tracks: {album['Total Tracks']}")
+            print(f"   Spotify URL: {album['Spotify URL']}\n")
+
+    @staticmethod
     def format_30secondPreview(previews):
         for prev in previews:
             return "30 second preview is: " + prev
@@ -127,7 +154,7 @@ class SpotifyAPIScenarios:
 class Main:
 
     token = SpotifyAPIScenarios.getAccessToken()
-    known_commands = {"top_tracks","cover_photo","artist_info","30-second_sample", "albums", "wikipedia","radio",
+    known_commands = {"top_tracks","cover_photo","artist_info","30-second_sample", "albums", "wikipedia","profile",
                       "popularity","genre" }
 
 
@@ -160,22 +187,23 @@ class Main:
             top_tracks = SpotifyAPIScenarios.get_TopTracksByArtist(token, artist_ID)
             samples = SpotifyAPIScenarios.get30secondSampleTrack(top_tracks)
             print(SpotifyAPIScenarios.format_30secondPreview(samples))
-        # elif command == "albums": Add to this after finishing the albums portion of the site
+        elif command == "albums":
+            albums = SpotifyAPIScenarios.get_AlbumsByArtist(token,artist_ID)
+            SpotifyAPIScenarios.format_album_list(albums)
 
-
-        #
         elif command == "wikipedia":
             wikipedia_url = f"https://en.wikipedia.org/wiki/{artist_userinput.replace(' ', '_')}"
             webbrowser.open(wikipedia_url)
 
+        elif command == "profile":
+            spotify_link = f"https://open.spotify.com/artist/{artist_ID}"
+            webbrowser.open(spotify_link)
 
 
-
-        # elif command == "radio":
-        #
         # elif command == "popularity":
 
         # elif command == "genres":
+
 
         else:
              print("Unknown command")
@@ -187,7 +215,7 @@ class Main:
     # Check the following tmm:
     # Find Data-Vis Techniques
 
-    # commit to the github Repo
+    # commit to the GitHub Repo
 
 
 
