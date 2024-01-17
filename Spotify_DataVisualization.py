@@ -86,6 +86,7 @@ class SpotifyAPIScenarios:
     # def get_AlbumsByArtist(token, artistID):
     #
 
+
     @staticmethod
     def get30secondSampleTrack(json_result):
         preview_urls = []
@@ -158,7 +159,8 @@ class Main:
             top_tracks = SpotifyAPIScenarios.get_TopTracksByArtist(token, artist_ID)
             samples = SpotifyAPIScenarios.get30secondSampleTrack(top_tracks)
             print(SpotifyAPIScenarios.format_30secondPreview(samples))
-        # elif command == "albums":
+        # elif command == "albums": Add to this after finishing the albums portion of the site
+
         #
         # elif command == "wikipedia":
 
@@ -167,7 +169,6 @@ class Main:
         # elif command == "popularity":
 
         # elif command == "genres":
-
 
         else:
              print("Unknown command")
