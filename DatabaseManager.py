@@ -37,9 +37,12 @@ class DatabaseManager:
                id INT AUTO_INCREMENT PRIMARY KEY,
                artist_id VARCHAR(255)
                album_name VARCHAR(255)
+               release_date DATE
                )
                """)
     return cursor
+
+
 
 
 

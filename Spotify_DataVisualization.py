@@ -80,20 +80,25 @@ class SpotifyAPIScenarios:
         headers = SpotifyAPIScenarios.get_AuthHeader(token)
         result = get(url, headers=headers)
         json_result = json.loads(result.content)["tracks"]
-        return SpotifyAPIScenarios.format_song_list(json_result)
+        return json_result
 
+    # @staticmethod
+    # def get_AlbumsByArtist(token, artistID):
+    #
 
     @staticmethod
-    def get30secondSampleTrack(result):
-        for track in result["tracks"][:10]:
-            print('track    : ' + track['name'])
-            print('audio    : ' + track['preview_url'])
-            print('cover art: ' + track['album']['images'][0]['url'])
-            print()
+    def get30secondSampleTrack(json_result):
+        preview_urls = []
+        for track in json_result:
+            # Check if the preview URL exists for the track
+            if track['preview_url'] is not None:
+                # Add the preview URL to the list
+                preview_urls.append(track['preview_url'])
+        return preview_urls
 
     @staticmethod
     def format_song_list(song_list):
-        formatted_songs = [] # This is a Helper Method
+        formatted_songs = [] # This is a Helper Method for the return of the top tracks!!
         for song in song_list:
             song_info = {
                 "Song Name": song['name'],
@@ -110,19 +115,19 @@ class SpotifyAPIScenarios:
             print(f"   Release Date: {formatted_songs[i]['Release Date']}")
             print(f"   Preview URL: {formatted_songs[i]['Preview URL']}\n")
 
-#
-# class DataVisTechniques:
-#
-#     @staticmethod
-#     def initializeDataVis(something):
-
+    @staticmethod
+    def format_30secondPreview(previews):
+        for prev in previews:
+            return "30 second preview is: " + prev
 
 
 
 class Main:
 
     token = SpotifyAPIScenarios.getAccessToken()
-    known_commands = {"top_tracks","cover_photo","artist_info" }
+    known_commands = {"top_tracks","cover_photo","artist_info","30-second_sample", "albums", "wikipedia","radio",
+                      "popularity","genre" }
+
 
     if len(sys.argv) > 1 and sys.argv[-1] not in known_commands: # Non-Specific Information about the artist
         artist_userinput = ' '.join(sys.argv[1:])
@@ -137,15 +142,33 @@ class Main:
         command = sys.argv[-1]
         artist_ID = SpotifyAPIScenarios.get_ArtistID(token, artist_userinput)
         if command == "top_tracks":
-            SpotifyAPIScenarios.get_TopTracksByArtist(token, artist_ID)
+            result= SpotifyAPIScenarios.get_TopTracksByArtist(token, artist_ID)
+            SpotifyAPIScenarios.format_song_list(result)
             # Process and print top_tracks here
         elif command == "cover_photo":
             cover_photo = SpotifyAPIScenarios.search_ForArtistCoverPhoto(token, artist_userinput)
             print(cover_photo)
         elif command == "artist_info":
             artist_info = SpotifyAPIScenarios.search_ForArtist(token, artist_userinput)
+            print(artist_info)
             # Process and print artist_info here
             # You can add more elif blocks for other commands
+        elif command == "30-second_sample":
+            # Uses the top tracks and only extracts a certain portion of the json_result
+            top_tracks = SpotifyAPIScenarios.get_TopTracksByArtist(token, artist_ID)
+            samples = SpotifyAPIScenarios.get30secondSampleTrack(top_tracks)
+            print(SpotifyAPIScenarios.format_30secondPreview(samples))
+        # elif command == "albums":
+        #
+        # elif command == "wikipedia":
+
+        # elif command == "radio":
+        #
+        # elif command == "popularity":
+
+        # elif command == "genres":
+
+
         else:
              print("Unknown command")
 
