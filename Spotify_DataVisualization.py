@@ -132,7 +132,8 @@ class SpotifyAPIScenarios:
                 "Artists": ", ".join([artist['name'] for artist in album['artists']]),
                 "Release Date": album['release_date'],
                 "Total Tracks": album['total_tracks'],
-                "Spotify URL": album['external_urls']['spotify']
+                "Spotify URL": album['external_urls']['spotify'],
+                "Available Markets": album['available_markets']
             }
             formatted_albums.append(album_info)
 
@@ -143,6 +144,7 @@ class SpotifyAPIScenarios:
             print(f"   Release Date: {album['Release Date']}")
             print(f"   Total Tracks: {album['Total Tracks']}")
             print(f"   Spotify URL: {album['Spotify URL']}\n")
+            print(f"   Available in Markets: {', '.join(album['Available Markets'])}")
 
     @staticmethod
     def format_30secondPreview(previews):
@@ -156,7 +158,6 @@ class Main:
     token = SpotifyAPIScenarios.getAccessToken()
     known_commands = {"top_tracks","cover_photo","artist_info","30-second_sample", "albums", "wikipedia","profile",
                       "popularity","genre" }
-
 
     if len(sys.argv) > 1 and sys.argv[-1] not in known_commands: # Non-Specific Information about the artist
         artist_userinput = ' '.join(sys.argv[1:])
@@ -200,7 +201,9 @@ class Main:
             webbrowser.open(spotify_link)
 
 
+
         # elif command == "popularity":
+
 
         # elif command == "genres":
 
