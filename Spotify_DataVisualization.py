@@ -151,16 +151,13 @@ class SpotifyAPIScenarios:
             return "30 second preview is: " + prev
 
 
-
-
-
 class Main:
     countries_to_highlight = ['US', 'CA', 'GB', 'FR', 'DE']
     mapVisualizer.DataVis.highlight_countries(countries_to_highlight)
 
     token = SpotifyAPIScenarios.getAccessToken()
     known_commands = {"top_tracks","cover_photo","artist_info","30-second_sample", "albums", "wikipedia","profile",
-                      "popularity","genre" }
+                      "popularity","genres" }
 
     if len(sys.argv) > 1 and sys.argv[-1] not in known_commands: # Non-Specific Information about the artist
         artist_userinput = ' '.join(sys.argv[1:])
@@ -207,8 +204,13 @@ class Main:
 
         # elif command == "popularity":
 
-
-        # elif command == "genres":
+        #
+        elif command == "genres":
+            info = SpotifyAPIScenarios.search_ForArtist(token,artist_userinput)
+            genres = info["genres"]
+            print("The associated genres for " + artist_userinput + " are : \n")
+            for index, genre in enumerate(genres, start=1):
+                print(f"{index}. {genre}")
 
 
         else:

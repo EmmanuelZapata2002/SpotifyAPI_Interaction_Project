@@ -2,6 +2,7 @@ import matplotlib.pyplot as plot
 from mpl_toolkits.basemap import Basemap
 
 
+
 class DataVis:
 
     @staticmethod
@@ -12,8 +13,9 @@ class DataVis:
         map.drawcoastlines()
         map.drawcountries()
 
-        for country in country_list:
+        for each in country_list:
             map.drawcountries(linewidth=2, color='r')
 
         plot.title('Album Availability Map')
         plot.show()
+
