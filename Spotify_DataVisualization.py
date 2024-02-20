@@ -10,7 +10,6 @@ from requests import post,get
 import sys
 import webbrowser
 
-import DatabaseManager
 import mapVisualizer
 
 # This is used for user input via the command line
