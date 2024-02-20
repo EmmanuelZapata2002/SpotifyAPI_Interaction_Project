@@ -1,3 +1,7 @@
+# Emmanuel Zapata Spotify_DataVis Project
+
+# Goal: Use Python for back-end, Flask for HTTP connection for backend to frontend, and React for the frontend
+
 import json
 import os
 import base64
@@ -6,6 +10,7 @@ from requests import post,get
 import sys
 import webbrowser
 
+import DatabaseManager
 import mapVisualizer
 
 # This is used for user input via the command line
@@ -152,6 +157,7 @@ class SpotifyAPIScenarios:
 
 
 class Main:
+    # db_connection = DatabaseManager.DatabaseManager.connect_to_Database()
     countries_to_highlight = ['US', 'CA', 'GB', 'FR', 'DE']
     mapVisualizer.DataVis.highlight_countries(countries_to_highlight)
 
@@ -174,6 +180,7 @@ class Main:
         if command == "top_tracks":
             result= SpotifyAPIScenarios.get_TopTracksByArtist(token, artist_ID)
             SpotifyAPIScenarios.format_song_list(result)
+            # DatabaseManager.DatabaseManager.createSQLTableTopTracksQuery(db_connection)
             # Process and print top_tracks here
         elif command == "cover_photo":
             cover_photo = SpotifyAPIScenarios.search_ForArtistCoverPhoto(token, artist_userinput)
