@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from requests import post, get
 import sys
 import webbrowser
-
+from database import ArtistData, ArtistQuery, get_database_session
 
 # This is used for user input via the command line
 
@@ -16,6 +16,8 @@ import webbrowser
 load_dotenv()
 client_id = os.getenv("CLIENT_ID")  # Client ID is in a .env file
 client_secret = os.getenv("CLIENT_SECRET")  # Client Secret is in a .env file
+
+db_session = get_database_session()  # Initializing Database session here
 
 
 class SpotifyAPIScenarios:
@@ -151,14 +153,35 @@ class SpotifyAPIScenarios:
         for prev in previews:
             return "30 second preview is: " + prev
 
+    @staticmethod
+    def save_artist_query(current_db_session, artist_name, query_type):
+
+        query_record = ArtistQuery(artist_name=artist_name, query_type=query_type)
+        current_db_session.add(query_record)
+        current_db_session.commit()  # Adds to the database here
+
+        print(f"Saved query: {artist_name} - {query_type}")
+
+    @staticmethod
+    def save_artist_data(current_db_session, artist_id, artist_name, genres):
+
+        artist_record = ArtistData(
+            artist_id=artist_id,
+            artist_name=artist_name,
+            genres=", ".join(genres) if genres else None
+        )
+
+        current_db_session.add(artist_record)
+        current_db_session.commit()
+        print(f"Saved artist data: {artist_name} (ID: {artist_id})")
+
 
 class Main:
-
     token = SpotifyAPIScenarios.getAccessToken()
     known_commands = {"top_tracks", "cover_photo", "artist_info", "30-second_sample", "albums", "wikipedia", "profile",
                       "popularity", "genres"}
 
-    if len(sys.argv) > 1 and sys.argv[-1] not in known_commands:  # Non-Specific Information about the artist
+    if len(sys.argv) > 1 and sys.argv[-1] not in known_commands:  # Non-Specific;Keeps track of Artist Names with Spaces
         artist_userinput = ' '.join(sys.argv[1:])
         search_Result = SpotifyAPIScenarios.search_ForArtist(token, artist_userinput)
         artist_ID = SpotifyAPIScenarios.get_ArtistID(token, artist_userinput)
@@ -170,6 +193,9 @@ class Main:
         artist_userinput = ' '.join(sys.argv[1:-1])
         command = sys.argv[-1]
         artist_ID = SpotifyAPIScenarios.get_ArtistID(token, artist_userinput)
+
+        SpotifyAPIScenarios.save_artist_query(db_session, artist_userinput, command)
+
         if command == "top_tracks":
             result = SpotifyAPIScenarios.get_TopTracksByArtist(token, artist_ID)
             SpotifyAPIScenarios.format_song_list(result)
@@ -180,34 +206,51 @@ class Main:
         elif command == "cover_photo":
             cover_photo = SpotifyAPIScenarios.search_ForArtistCoverPhoto(token, artist_userinput)
             print(cover_photo)
+
+
         elif command == "artist_info":
             artist_info = SpotifyAPIScenarios.search_ForArtist(token, artist_userinput)
+            genres = artist_info["genres"]
+
+            SpotifyAPIScenarios.save_artist_data(db_session, artist_info["id"], artist_userinput, genres)
             print(artist_info)
+
             # Process and print artist_info here
-            # You can add more elif blocks for other commands
+
+
         elif command == "30-second_sample":
             # Uses the top tracks and only extracts a certain portion of the json_result
             top_tracks = SpotifyAPIScenarios.get_TopTracksByArtist(token, artist_ID)
             samples = SpotifyAPIScenarios.get30secondSampleTrack(top_tracks)
             print(SpotifyAPIScenarios.format_30secondPreview(samples))
 
+
+
         elif command == "albums":
             albums = SpotifyAPIScenarios.get_AlbumsByArtist(token, artist_ID)
             SpotifyAPIScenarios.format_album_list(albums)
+
+
 
         elif command == "wikipedia":
             wikipedia_url = f"https://en.wikipedia.org/wiki/{artist_userinput.replace(' ', '_')}"
             webbrowser.open(wikipedia_url)
 
+
+
         elif command == "profile":
             spotify_link = f"https://open.spotify.com/artist/{artist_ID}"
             webbrowser.open(spotify_link)
+
+
 
         elif command == "genres":
             info = SpotifyAPIScenarios.search_ForArtist(token, artist_userinput)
             genres = info["genres"]
             print("The associated genres for " + artist_userinput + " are : \n")
             for index, genre in enumerate(genres, start=1):
+
+
                 print(f"{index}. {genre}")
         else:
             print("Unknown command")
