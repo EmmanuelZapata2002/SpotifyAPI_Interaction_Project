@@ -1,24 +1,22 @@
-# Emmanuel Zapata Spotify_DataVis Project
+# Emmanuel Zapata BackEnd Development Project
 
-# Goal: Use Python for back-end, Flask for HTTP connection for backend to frontend, and React for the frontend
-
+# Goal: Use Python for back-end Connection to Work with the Spotify API
 import json
 import os
 import base64
 from dotenv import load_dotenv
-from requests import post,get
+from requests import post, get
 import sys
 import webbrowser
 
-import mapVisualizer
 
 # This is used for user input via the command line
 
-
 # This is for getting any information about your favorite artist.  :)
 load_dotenv()
-client_id = os.getenv("CLIENT_ID") # Client ID is in a .env file
-client_secret = os.getenv("CLIENT_SECRET") #Client Secret is in a .env file
+client_id = os.getenv("CLIENT_ID")  # Client ID is in a .env file
+client_secret = os.getenv("CLIENT_SECRET")  # Client Secret is in a .env file
+
 
 class SpotifyAPIScenarios:
     @staticmethod
@@ -29,11 +27,11 @@ class SpotifyAPIScenarios:
 
         url = "https://accounts.spotify.com/api/token"
         headers = {
-        "Authorization": "Basic " + auth_Base64,
-        "Content-Type": "application/x-www-form-urlencoded"
+            "Authorization": "Basic " + auth_Base64,
+            "Content-Type": "application/x-www-form-urlencoded"
         }
         data = {"grant_type": "client_credentials"}
-        result = post(url,headers=headers,data=data)
+        result = post(url, headers=headers, data=data)
         json_result = json.loads(result.content)
         token = json_result["access_token"]
         return token
@@ -58,7 +56,7 @@ class SpotifyAPIScenarios:
         return artist
 
     @staticmethod
-    def search_ForArtistCoverPhoto(token,artistName):
+    def search_ForArtistCoverPhoto(token, artistName):
         url = "https://api.spotify.com/v1/search"
         headers = SpotifyAPIScenarios.get_AuthHeader(token)
         query = f"?q={artistName}&type=artist&limit=1"
@@ -94,7 +92,6 @@ class SpotifyAPIScenarios:
         json_result = json.loads(result.content)["items"]
         return json_result
 
-
     @staticmethod
     def get30secondSampleTrack(json_result):
         preview_urls = []
@@ -107,7 +104,7 @@ class SpotifyAPIScenarios:
 
     @staticmethod
     def format_song_list(song_list):
-        formatted_songs = [] # This is a Helper Method for the return of the top tracks!!
+        formatted_songs = []  # This is a Helper Method for the return of the top tracks!!
         for song in song_list:
             song_info = {
                 "Song Name": song['name'],
@@ -156,15 +153,12 @@ class SpotifyAPIScenarios:
 
 
 class Main:
-    # db_connection = DatabaseManager.DatabaseManager.connect_to_Database()
-    countries_to_highlight = ['US', 'CA', 'GB', 'FR', 'DE']
-    mapVisualizer.DataVis.highlight_countries(countries_to_highlight)
 
     token = SpotifyAPIScenarios.getAccessToken()
-    known_commands = {"top_tracks","cover_photo","artist_info","30-second_sample", "albums", "wikipedia","profile",
-                      "popularity","genres" }
+    known_commands = {"top_tracks", "cover_photo", "artist_info", "30-second_sample", "albums", "wikipedia", "profile",
+                      "popularity", "genres"}
 
-    if len(sys.argv) > 1 and sys.argv[-1] not in known_commands: # Non-Specific Information about the artist
+    if len(sys.argv) > 1 and sys.argv[-1] not in known_commands:  # Non-Specific Information about the artist
         artist_userinput = ' '.join(sys.argv[1:])
         search_Result = SpotifyAPIScenarios.search_ForArtist(token, artist_userinput)
         artist_ID = SpotifyAPIScenarios.get_ArtistID(token, artist_userinput)
@@ -172,15 +166,17 @@ class Main:
         cover_Photo = SpotifyAPIScenarios.search_ForArtistCoverPhoto(token, artist_userinput)
         print(cover_Photo)
 
-    if len(sys.argv) > 2 and sys.argv[-1] in known_commands: # User specifies what they want from the command line
+    if len(sys.argv) > 2 and sys.argv[-1] in known_commands:  # User specifies what they want from the command line
         artist_userinput = ' '.join(sys.argv[1:-1])
         command = sys.argv[-1]
         artist_ID = SpotifyAPIScenarios.get_ArtistID(token, artist_userinput)
         if command == "top_tracks":
-            result= SpotifyAPIScenarios.get_TopTracksByArtist(token, artist_ID)
+            result = SpotifyAPIScenarios.get_TopTracksByArtist(token, artist_ID)
             SpotifyAPIScenarios.format_song_list(result)
             # DatabaseManager.DatabaseManager.createSQLTableTopTracksQuery(db_connection)
             # Process and print top_tracks here
+            print(SpotifyAPIScenarios.get_TopTracksByArtist(token, artist_userinput))
+
         elif command == "cover_photo":
             cover_photo = SpotifyAPIScenarios.search_ForArtistCoverPhoto(token, artist_userinput)
             print(cover_photo)
@@ -194,8 +190,9 @@ class Main:
             top_tracks = SpotifyAPIScenarios.get_TopTracksByArtist(token, artist_ID)
             samples = SpotifyAPIScenarios.get30secondSampleTrack(top_tracks)
             print(SpotifyAPIScenarios.format_30secondPreview(samples))
+
         elif command == "albums":
-            albums = SpotifyAPIScenarios.get_AlbumsByArtist(token,artist_ID)
+            albums = SpotifyAPIScenarios.get_AlbumsByArtist(token, artist_ID)
             SpotifyAPIScenarios.format_album_list(albums)
 
         elif command == "wikipedia":
@@ -206,34 +203,19 @@ class Main:
             spotify_link = f"https://open.spotify.com/artist/{artist_ID}"
             webbrowser.open(spotify_link)
 
-
-
-        # elif command == "popularity":
-
-        #
         elif command == "genres":
-            info = SpotifyAPIScenarios.search_ForArtist(token,artist_userinput)
+            info = SpotifyAPIScenarios.search_ForArtist(token, artist_userinput)
             genres = info["genres"]
             print("The associated genres for " + artist_userinput + " are : \n")
             for index, genre in enumerate(genres, start=1):
                 print(f"{index}. {genre}")
-
-
         else:
-             print("Unknown command")
+            print("Unknown command")
 
     if len(sys.argv) == 1:
         print("No arguments provided. Try Again please !")
-
 
     # Check the following tmm:
     # Find Data-Vis Techniques
 
     # commit to the GitHub Repo
-
-
-
-
-
-
-
