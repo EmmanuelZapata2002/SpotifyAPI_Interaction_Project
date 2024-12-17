@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from requests import post, get
 import sys
 import webbrowser
-from database import ArtistData, ArtistQuery, get_database_session
+from database import ArtistData, ArtistQuery, get_database_session, ArtistCoverPhotoLinks
 
 # This is used for user input via the command line
 
@@ -175,6 +175,18 @@ class SpotifyAPIScenarios:
         current_db_session.commit()
         print(f"Saved artist data: {artist_name} (ID: {artist_id})")
 
+    @staticmethod
+    def save_artist_cover_photo_link(current_db_session, artist_name, cover_photo_link):
+
+        cover_photo_record = ArtistCoverPhotoLinks(
+            artist_name=artist_name,
+            cover_photo_link=cover_photo_link
+        )
+
+        current_db_session.add(cover_photo_record)
+        current_db_session.commit()
+        print(f"Saved cover photo link: {artist_name} - {cover_photo_link}")
+
 
 class Main:
     token = SpotifyAPIScenarios.getAccessToken()
@@ -205,6 +217,7 @@ class Main:
 
         elif command == "cover_photo":
             cover_photo = SpotifyAPIScenarios.search_ForArtistCoverPhoto(token, artist_userinput)
+            SpotifyAPIScenarios.save_artist_cover_photo_link(db_session,artist_userinput, cover_photo)
             print(cover_photo)
 
 
@@ -231,11 +244,9 @@ class Main:
             SpotifyAPIScenarios.format_album_list(albums)
 
 
-
         elif command == "wikipedia":
             wikipedia_url = f"https://en.wikipedia.org/wiki/{artist_userinput.replace(' ', '_')}"
             webbrowser.open(wikipedia_url)
-
 
 
         elif command == "profile":

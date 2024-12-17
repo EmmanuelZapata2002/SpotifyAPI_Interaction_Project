@@ -20,6 +20,15 @@ class ArtistData(Base):
     genres = Column(String)
 
 
+class ArtistCoverPhotoLinks(Base):
+    __tablename__ = 'artist_cover_photo_links'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    artist_name = Column(String, nullable=False)
+    cover_photo_link = Column(String, nullable=False)
+
+
+
+
 # Setup database
 def get_database_session(db_url="sqlite:///spotify_queries.db"):
     engine = create_engine(db_url)
